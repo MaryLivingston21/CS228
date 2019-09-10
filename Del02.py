@@ -43,7 +43,7 @@ def Scale(n, oMin, oMax, newMin, newMax):
 def Handle_Finger(finger):
 	for b in range(0,4):
 		bone = finger.bone(b)
-		Handle_Bone(bone, 4-b)
+		Handle_Bone(bone, 1)
 
 
 def Handle_Bone(bone, width):
@@ -58,7 +58,7 @@ def Handle_Vector_FromLeap(v):
 	global x, y
 	global xMin, xMax, yMin, yMax
 	x = Scale(v[0], xMin, xMax, 0, myConstants.pygameWindowWidth)
-	y = Scale(v[2], yMin, yMax, 0, myConstants.pygameWindowDepth)
+	y = Scale(v[2], xMin, xMax, 0, myConstants.pygameWindowDepth) #fix this
 	#print(x,y)
 
 	if (x < xMin):
