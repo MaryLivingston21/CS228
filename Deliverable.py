@@ -2,6 +2,7 @@ from pygameWindow import PYGAME_WINDOW
 from constants import CONSTANTS
 
 import numpy as np
+import pickle
 
 class DELIVERABLE:
     def __init__(self,controller, pygameWindow, x, y, xMin, xMax, yMin, yMax):
@@ -33,7 +34,8 @@ class DELIVERABLE:
             self.i = self.i + 1
 
         if self.Recording_Is_Ending():
-            print(self.gestureData)
+            #print(self.gestureData)
+            pass
 
 
     def Scale(self, n, oMin, oMax, newMin, newMax):
@@ -56,21 +58,21 @@ class DELIVERABLE:
 
 
     def Handle_Bone(self, bone, width):
-    	base = bone.prev_joint
-    	tip = bone.next_joint
+    	self.base = bone.prev_joint
+    	self.tip = bone.next_joint
         if (self.currNumberOfHands == 1):
-            self.pygameWindow.Draw_Line(self.Handle_Vector_FromLeap(tip), self.Handle_Vector_FromLeap(base), width, (0,255,0))
+            self.pygameWindow.Draw_Line(self.Handle_Vector_FromLeap(self.tip), self.Handle_Vector_FromLeap(self.base), width, (0,255,0))
         elif (self.currNumberOfHands == 2):
-            self.pygameWindow.Draw_Line(self.Handle_Vector_FromLeap(tip), self.Handle_Vector_FromLeap(base), width, (255,0,0))
-
-            self.gestureData[self.i,self.j,0] = base[0]
-            self.gestureData[self.i,self.j,1] = base[1]
-            self.gestureData[self.i,self.j,2] = base[2]
-            self.gestureData[self.i,self.j,3] = tip[0]
-            self.gestureData[self.i,self.j,4] = tip[1]
-            self.gestureData[self.i,self.j,5] = tip[2]
+            self.pygameWindow.Draw_Line(self.Handle_Vector_FromLeap(self.tip), self.Handle_Vector_FromLeap(self.base), width, (255,0,0))
 
             #print(self.gestureData)
+        if self.Recording_Is_Ending():
+            self.gestureData[self.i,self.j,0] = self.base[0]
+            self.gestureData[self.i,self.j,1] = self.base[1]
+            self.gestureData[self.i,self.j,2] = self.base[2]
+            self.gestureData[self.i,self.j,3] = self.tip[0]
+            self.gestureData[self.i,self.j,4] = self.tip[1]
+            self.gestureData[self.i,self.j,5] = self.tip[2]
     	#print tip, base
     	#print Handle_Vector_FromLeap(tip), Handle_Vector_FromLeap(base)
 
@@ -105,6 +107,12 @@ class DELIVERABLE:
 
     def Recording_Is_Ending(self):
         if (self.currNumberOfHands == 1 and self.prevNumberOfHands == 2):
+            self.Save_Gesture()
             return True
         else:
             return False
+
+    def Save_Gesture(self):
+        save_gesture = open("userData/gesture.p", "wb")
+        pickle.dump(self.gestureData, save_gesture)
+        save_gesture.close()
