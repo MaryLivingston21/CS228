@@ -1,10 +1,13 @@
 from pygameWindow import PYGAME_WINDOW
 from constants import CONSTANTS
 
+import numpy as np
+
 class DELIVERABLE:
     def __init__(self,controller, pygameWindow, x, y, xMin, xMax, yMin, yMax):
         self.controller = controller
         self.pygameWindow = pygameWindow
+
         self.x = x
         self.y = y
         self.xMin = xMin
@@ -12,15 +15,25 @@ class DELIVERABLE:
         self.yMin = yMin
         self.yMax = yMax
         self.myConstants = CONSTANTS()
-        #self.numberOfHands = 0
+        self.prevNumberOfHands = 0
+        self.currNumberOfHands = 0
+        self.i = 0
+        self.j = 0
 
+        self.gestureData = np.zeros((5,4,6), dtype='f')
 
     def Handle_Frame(self, frame):
-    	hand = frame.hands[0]
-    	fingers = hand.fingers
+        self.i = 0
+        hand = frame.hands[0]
+        self.currNumberOfHands = len(frame.hands)
+        fingers = hand.fingers
 
-    	for finger in fingers:
-    		self.Handle_Finger(finger)
+        for finger in fingers:
+            self.Handle_Finger(finger)
+            self.i = self.i + 1
+
+        if self.Recording_Is_Ending():
+            print(self.gestureData)
 
 
     def Scale(self, n, oMin, oMax, newMin, newMax):
@@ -35,16 +48,29 @@ class DELIVERABLE:
 
 
     def Handle_Finger(self, finger):
-    	for b in range(0,4):
-    		bone = finger.bone(b)
-    		self.Handle_Bone(bone, 4 - b )
+        self.j = 0
+        for b in range(0,4):
+            bone = finger.bone(b)
+            self.Handle_Bone(bone, 4 - b )
+            self.j = self.j + 1
 
 
     def Handle_Bone(self, bone, width):
     	base = bone.prev_joint
     	tip = bone.next_joint
+        if (self.currNumberOfHands == 1):
+            self.pygameWindow.Draw_Line(self.Handle_Vector_FromLeap(tip), self.Handle_Vector_FromLeap(base), width, (0,255,0))
+        elif (self.currNumberOfHands == 2):
+            self.pygameWindow.Draw_Line(self.Handle_Vector_FromLeap(tip), self.Handle_Vector_FromLeap(base), width, (255,0,0))
 
-    	self.pygameWindow.Draw_Black_Line(self.Handle_Vector_FromLeap(tip), self.Handle_Vector_FromLeap(base), width)
+            self.gestureData[self.i,self.j,0] = base[0]
+            self.gestureData[self.i,self.j,1] = base[1]
+            self.gestureData[self.i,self.j,2] = base[2]
+            self.gestureData[self.i,self.j,3] = tip[0]
+            self.gestureData[self.i,self.j,4] = tip[1]
+            self.gestureData[self.i,self.j,5] = tip[2]
+
+            #print(self.gestureData)
     	#print tip, base
     	#print Handle_Vector_FromLeap(tip), Handle_Vector_FromLeap(base)
 
@@ -70,8 +96,15 @@ class DELIVERABLE:
         if len(frame.hands) != 0:
             self.Handle_Frame(frame)
         self.pygameWindow.Reveal()
+        self.prevNumberOfHands = self.currNumberOfHands
 
 
     def Run_Forever(self):
         while True:
             self.Run_Once()
+
+    def Recording_Is_Ending(self):
+        if (self.currNumberOfHands == 1 and self.prevNumberOfHands == 2):
+            return True
+        else:
+            return False
