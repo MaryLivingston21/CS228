@@ -3,6 +3,8 @@ from constants import CONSTANTS
 
 import numpy as np
 import pickle
+import os
+import shutil
 
 class DELIVERABLE:
     def __init__(self,controller, pygameWindow, x, y, xMin, xMax, yMin, yMax):
@@ -23,6 +25,17 @@ class DELIVERABLE:
         self.numFiles = 0
         self.gestureData = np.zeros((5,4,6), dtype='f')
 
+
+    def Handle_Directory(self):
+        try:
+            shutil.rmtree("userData")
+        except:
+            "directory does not exist"
+        try:
+            os.mkdir("userData")
+        except:
+            "directory exists"
+
     def Handle_Frame(self, frame):
         self.i = 0
         hand = frame.hands[0]
@@ -34,6 +47,8 @@ class DELIVERABLE:
             self.i = self.i + 1
 
         if self.Recording_Is_Ending():
+            if self.numFiles == 0:
+                self.Handle_Directory()
             self.Save_Gesture()
 
 
@@ -111,7 +126,7 @@ class DELIVERABLE:
             return False
 
     def Save_Gesture(self):
-        save_gesture = open("userData/gesture" + str(self.numFiles) + ".p", "wb")
+        save_gesture = open("userData/gesture" + str(self.numFiles) + ".p", "w")
         pickle.dump(self.gestureData, save_gesture)
         save_gesture.close()
         self.numFiles += 1
