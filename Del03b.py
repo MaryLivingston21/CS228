@@ -1,2 +1,3 @@
-import numpy
-import pickle
+from Reader import READER
+
+my_reader = READER()

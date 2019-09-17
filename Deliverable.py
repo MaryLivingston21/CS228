@@ -20,7 +20,7 @@ class DELIVERABLE:
         self.currNumberOfHands = 0
         self.i = 0
         self.j = 0
-
+        self.numFiles = 0
         self.gestureData = np.zeros((5,4,6), dtype='f')
 
     def Handle_Frame(self, frame):
@@ -34,8 +34,7 @@ class DELIVERABLE:
             self.i = self.i + 1
 
         if self.Recording_Is_Ending():
-            #print(self.gestureData)
-            pass
+            self.Save_Gesture()
 
 
     def Scale(self, n, oMin, oMax, newMin, newMax):
@@ -107,12 +106,12 @@ class DELIVERABLE:
 
     def Recording_Is_Ending(self):
         if (self.currNumberOfHands == 1 and self.prevNumberOfHands == 2):
-            self.Save_Gesture()
             return True
         else:
             return False
 
     def Save_Gesture(self):
-        save_gesture = open("userData/gesture.p", "wb")
+        save_gesture = open("userData/gesture" + str(self.numFiles) + ".p", "wb")
         pickle.dump(self.gestureData, save_gesture)
         save_gesture.close()
+        self.numFiles += 1
