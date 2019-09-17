@@ -15,7 +15,7 @@ class READER:
         self.yMin = self.myconsts.pygameWindowDepth
         self.yMax = -self.myconsts.pygameWindowDepth
 
-        self.pygameWindow = PYGAME_WINDOW()
+        self.PygameWindow = PYGAME_WINDOW()
 
 
     def getNumData(self, fileName):
@@ -45,7 +45,7 @@ class READER:
 
 
     def Draw_Gesture(self, n):
-        self.pygameWindow.Prepare()
+        self.PygameWindow.Prepare()
 
         file_in = open("userData/gesture" + str(n)+ ".p", "rb")
         gestureData = pickle.load(file_in)
@@ -56,22 +56,21 @@ class READER:
                 xBaseNotScaled = currentBone[0]
                 yBaseNotScaled = currentBone[2] # why z?
                 xTipNotScaled = currentBone[3]
-                yTipNotScaled = currentBone[5] #why z?
+                yTipNotScaled = currentBone[5]#why z?
+                xBase = self.Scale(xBaseNotScaled, 0, self.myconsts.pygameWindowWidth)
+                yBase = self.Scale(yBaseNotScaled, 0, self.myconsts.pygameWindowDepth)
+                xTip = self.Scale(xTipNotScaled, 0, self.myconsts.pygameWindowWidth)
+                yTip = self.Scale(yTipNotScaled, 0, self.myconsts.pygameWindowDepth)
 
-
-                self.pygameWindow.Draw_Line(self.Scale(currentBone[0:3],0,self.myconsts.pygameWindowWidth),self.Scale(currentBone[3:6],0,self.myconsts.pygameWindowDepth),4,(0,0,255))
-        self.pygameWindow.Reveal()
+                self.PygameWindow.Draw_Line(xBase, yBase, xTip, yTip, 4, (0,0,255))
+        self.PygameWindow.Reveal()
         time.sleep(0.3)
 
-    def Scale(self, (x,y,z), newMin, newMax):
-        if(self.xMin == newMax):
-            return x, y, z
+    def Scale(self, x, newMin, newMax):
+        if(self.xMin == self.xMax):
+            return x
         x = x - self.xMin
-        y = y - self.yMin
-        z = z - self.yMin
         old = self.xMax - self.xMin
         new = newMax - newMin
         newX = (x * new) / old
-        newY = (y * new) / old
-        newZ = (z * new) / old
-        return newX, newY, newZ
+        return newX

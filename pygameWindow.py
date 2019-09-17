@@ -24,5 +24,5 @@ class PYGAME_WINDOW:
 		revY = myConstants.pygameWindowDepth - y
 		pygame.draw.circle(self.screen,(0,0,0),(x,revY),10)
 
-	def Draw_Black_Line(self, tip, base, width):
-		pygame.draw.line(self.screen,(0,0,0),(tip[0],tip[1]),(base[0],base[1]),width)
+	def Draw_Line(self, xtip, ytip, xbase, ybase, width, color):
+		pygame.draw.line(self.screen,(color),(xtip,ytip),(xbase,ybase),width)
