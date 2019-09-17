@@ -4,16 +4,16 @@ import os
 import time
 
 from constants import CONSTANTS
-from pygameWindow_Del03 import PYGAME_WINDOW
+from pyGameWindow_Del03 import PYGAME_WINDOW
 
 class READER:
     def __init__(self):
         self.myconsts = CONSTANTS()
         self.getNumData('userData')
-        self.xMin = self.myconsts.pygameWindowWidth
-        self.xMax = -self.myconsts.pygameWindowWidth
-        self.yMin = self.myconsts.pygameWindowDepth
-        self.yMax = -self.myconsts.pygameWindowDepth
+        self.xMin = -self.myconsts.pygameWindowWidth
+        self.xMax = self.myconsts.pygameWindowWidth
+        self.yMin = -self.myconsts.pygameWindowDepth
+        self.yMax = self.myconsts.pygameWindowDepth
 
         self.PygameWindow = PYGAME_WINDOW()
 
@@ -62,7 +62,7 @@ class READER:
                 xTip = self.Scale(xTipNotScaled, 0, self.myconsts.pygameWindowWidth)
                 yTip = self.Scale(yTipNotScaled, 0, self.myconsts.pygameWindowDepth)
 
-                self.PygameWindow.Draw_Line(xBase, yBase, xTip, yTip, 4, (0,0,255))
+                self.PygameWindow.Draw_Lines(xBase, yBase, xTip, yTip, 4, (0,0,255))
         self.PygameWindow.Reveal()
         time.sleep(0.3)
 
