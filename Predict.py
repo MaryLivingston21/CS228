@@ -21,7 +21,14 @@ colors[0,:] = [1,0.5,0.5] #red
 colors[1,:] = [0.5,1,0.5] #light green
 colors[2,:] = [0.5,0.5,1] #light blue
 
+[numItems,numFeatures] = knn.data.shape
+
+for i in range(0,numItems/2):
+    itemClass = int(trainy[i]) #extracts ith item
+    currColor = colors[itemClass,:] #creates red green blue vector
+    plt.scatter(trainX[i,0],trainX[i,1],facecolor=currColor, s=50, lw=2)
+
 plt.figure()
-plt.scatter(trainX[:,0], trainX[:,1], c=trainy)
-plt.scatter(testX[:,0], testX[:,1], c=testy)
+#plt.scatter(trainX[:,0], trainX[:,1], c=trainy)
+#plt.scatter(testX[:,0], testX[:,1], c=testy)
 plt.show()
