@@ -5,7 +5,7 @@ from Leap import *
 
 from pyGameWindow_Del03 import PYGAME_WINDOW
 from constants import CONSTANTS
-from Deliverable import DELIVERABLE
+from Recorder import DELIVERABLE
 
 myConstants = CONSTANTS()
 

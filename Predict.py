@@ -47,5 +47,5 @@ for i in range (0,numItems/2):
     currColor = colors[itemClass,:]
     plt.scatter(testX[i,0], testX[i,1], facecolor=currColor, s=50, lw=2, edgecolor=edgeColor)
 
-print(numCorrect)
+print(float(numCorrect)/(numItems/2) * 100.0,'%')
 plt.show()
