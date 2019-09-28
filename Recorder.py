@@ -1,4 +1,4 @@
-from pygameWindow import PYGAME_WINDOW
+from pyGameWindow_Del03 import PYGAME_WINDOW
 from constants import CONSTANTS
 
 import numpy as np
@@ -6,7 +6,7 @@ import pickle
 import os
 import shutil
 
-class DELIVERABLE:
+class RECORDER:
     def __init__(self,controller, pygameWindow, x, y, xMin, xMax, yMin, yMax):
         self.controller = controller
         self.pygameWindow = pygameWindow
@@ -22,8 +22,10 @@ class DELIVERABLE:
         self.currNumberOfHands = 0
         self.i = 0
         self.j = 0
-        self.numFiles = 0
-        self.gestureData = np.zeros((5,4,6), dtype='f')
+
+        self.numberOfGestures = 1000
+        self.gestureIndex = 0
+        self.gestureData = np.zeros((5,4,6,self.numberOfGestures),dtype='f')
 
 
     def Handle_Directory(self):
@@ -47,9 +49,15 @@ class DELIVERABLE:
             self.i = self.i + 1
 
         if self.Recording_Is_Ending():
-            if self.numFiles == 0:
-                self.Handle_Directory()
-            self.Save_Gesture()
+            self.Handle_Directory()
+            #self.Save_Gesture()
+
+        if self.currNumberOfHands == 2:
+            print('gesture ' + str(self.gestureIndex) + ' stored.')
+            self.gestureIndex = self.gestureIndex + 1
+            if self.gestureIndex == self.numberOfGestures:
+                self.Save_Gesture()
+                exit(0)
 
 
     def Scale(self, n, oMin, oMax, newMin, newMax):
@@ -75,20 +83,28 @@ class DELIVERABLE:
     	self.base = bone.prev_joint
     	self.tip = bone.next_joint
         if (self.currNumberOfHands == 1):
-            self.pygameWindow.Draw_Line(self.Handle_Vector_FromLeap(self.tip), self.Handle_Vector_FromLeap(self.base), width, (0,255,0))
+            self.pygameWindow.Draw_Lines(self.Handle_Vector_FromLeap(self.tip), self.Handle_Vector_FromLeap(self.base), width, (0,255,0))
         elif (self.currNumberOfHands == 2):
-            self.pygameWindow.Draw_Line(self.Handle_Vector_FromLeap(self.tip), self.Handle_Vector_FromLeap(self.base), width, (255,0,0))
+            self.pygameWindow.Draw_Lines(self.Handle_Vector_FromLeap(self.tip), self.Handle_Vector_FromLeap(self.base), width, (255,0,0))
 
             #print(self.gestureData)
-        if self.Recording_Is_Ending():
-            self.gestureData[self.i,self.j,0] = self.base[0]
-            self.gestureData[self.i,self.j,1] = self.base[1]
-            self.gestureData[self.i,self.j,2] = self.base[2]
-            self.gestureData[self.i,self.j,3] = self.tip[0]
-            self.gestureData[self.i,self.j,4] = self.tip[1]
-            self.gestureData[self.i,self.j,5] = self.tip[2]
+        #if self.Recording_Is_Ending():
+            #self.gestureData[self.i,self.j,0] = self.base[0]
+            #self.gestureData[self.i,self.j,1] = self.base[1]
+            #self.gestureData[self.i,self.j,2] = self.base[2]
+            #self.gestureData[self.i,self.j,3] = self.tip[0]
+            #self.gestureData[self.i,self.j,4] = self.tip[1]
+            #self.gestureData[self.i,self.j,5] = self.tip[2]
     	#print tip, base
     	#print Handle_Vector_FromLeap(tip), Handle_Vector_FromLeap(base)
+
+        if (self.currNumberOfHands == 2):
+            self.gestureData[self.i, self.j, 0, self.gestureIndex] = self.base[0]
+            self.gestureData[self.i, self.j, 1, self.gestureIndex] = self.base[1]
+            self.gestureData[self.i, self.j, 2, self.gestureIndex] = self.base[2]
+            self.gestureData[self.i, self.j, 3, self.gestureIndex] = self.tip[0]
+            self.gestureData[self.i, self.j, 4, self.gestureIndex] = self.tip[1]
+            self.gestureData[self.i, self.j, 5, self.gestureIndex] = self.tip[2]
 
 
     def Handle_Vector_FromLeap(self, v):
@@ -126,7 +142,6 @@ class DELIVERABLE:
             return False
 
     def Save_Gesture(self):
-        save_gesture = open("userData/gesture" + str(self.numFiles) + ".p", "w")
+        save_gesture = open("userData/gesture.p", "w")
         pickle.dump(self.gestureData, save_gesture)
         save_gesture.close()
-        self.numFiles += 1
