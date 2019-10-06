@@ -7,16 +7,12 @@ import random
 import pickle
 
 
-from pygameWindow import PYGAME_WINDOW
+from pygameWindow6 import PYGAME_WINDOW
 from constants import CONSTANTS
 
 pygameWindow = PYGAME_WINDOW()
 myConstants = CONSTANTS()
 controller = Controller()
-
-# load in classifier
-clf = pickle.load( open('userData/classifier.p','rb') )
-testData = np.zeros((1,30),dtype='f')
 
 #center position
 x = int(myConstants.pygameWindowWidth / 2)
@@ -27,14 +23,11 @@ xMax = -1000.0
 yMin = 1000.0
 yMax = -1000.0
 
+# load in classifier
+clf = pickle.load( open('userData/classifier.p','rb') )
+testData = np.zeros((1,30),dtype='f')
 
-
-def Handle_Frame(frame):
-	global x, y, xMin, xMax, yMin, yMax
-	hand = frame.hands[0]
-	fingers = hand.fingers
-	for finger in fingers:
-		Handle_Finger(finger)
+k = 0
 
 
 def Scale(n, oMin, oMax, newMin, newMax):
@@ -47,21 +40,42 @@ def Scale(n, oMin, oMax, newMin, newMax):
 	return newN
 
 
+def Handle_Frame(frame):
+	global x, y, xMin, xMax, yMin, yMax, k, testData
+	hand = frame.hands[0]
+	fingers = hand.fingers
+	k = 0
+	for finger in fingers:
+		Handle_Finger(finger)
+	#print(testData)
+	#testData = CenterData(testData)
+	CenterData()
+	predictedClass = clf.Predict(testData)
+	print(predictedClass)
+
+
 def Handle_Finger(finger):
 	for b in range(0,4):
 		bone = finger.bone(b)
-		Handle_Bone(bone, 4 - b )
+		Handle_Bone(bone, 4 - b)
 
 
 def Handle_Bone(bone, width):
+	global k, testData
 	base = bone.prev_joint
 	tip = bone.next_joint
+
 	xBase, yBase = Handle_Vector_FromLeap(base)
 	xTip, yTip = Handle_Vector_FromLeap(tip)
 
 	pygameWindow.Draw_Black_Line(xBase, yBase, xTip, yTip, width)
-	#print tip, base
-	#print Handle_Vector_FromLeap(tip), Handle_Vector_FromLeap(base)
+
+	b = 4 - width
+	if ( (b==0) or (b==3) ):
+		testData[0,k] = tip[0]
+		testData[0,k+1] = tip[1]
+		testData[0,k+2] = tip[2]
+		k = k + 3
 
 
 def Handle_Vector_FromLeap(v):
@@ -83,40 +97,27 @@ def Handle_Vector_FromLeap(v):
 
 	return x, y
 
+def CenterData():
+	global testData
+	totalX = testData[0,::3]
+	avgX = totalX.mean()
+	testData[0,::3] = totalX - avgX
+
+	totalY = testData[0,1::3]
+	avgY = totalY.mean()
+	testData[0,1::3] = totalY - avgY
+
+	totalZ = testData[0,2::3]
+	avgZ = totalZ.mean()
+	testData[0,2::3] = totalZ - avgZ
+
+
 
 while True:
+
 	pygameWindow.Prepare()
+
 	frame = controller.frame()
 	if len(frame.hands) > 0:
-		hand = frame.hands[0]
 		Handle_Frame(frame)
-		k = 0
-		for finger in range(0,5):
-			finger = hand.fingers[finger]
-			for b in range(0,4):
-				if b == 0:
-                    bone = finger.bone(Leap.Bone.TYPE_METACARPAL)
-				elif b == 1:
-                    bone = finger.bone(Leap.Bone.TYPE_PROXIMAL)
-				elif b == 2:
-                    bone = finger.bone(Leap.Bone.TYPE_INTERMEDIATE)
-				elif b == 3:
-                    bone = finger.bone(Leap.Bone.TYPE_DISTAL)
-
-				boneBase = bone.prev_joint
-				boneTip = bone.next_joint
-
-				xBase = boneBase[0]
-                yBase = boneBase[1]
-                zBase = boneBase[2]
-                xTip  = boneTip[0]
-                yTip  = boneTip[1]
-                zTip  = boneTip[2]
-
-                if ((b == 0)or(b == 3)):
-                    testData[0, k] = xTip
-                    testData[0, k+1] = yTip
-                    testData[0, k+2] = zTip
-                    k = k+3
-		print(testData)
 	pygameWindow.Reveal()
