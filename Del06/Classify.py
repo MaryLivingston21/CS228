@@ -79,3 +79,5 @@ for row in range(0,2000):
 
 percCorrect = (float(numCorrect)/2000.0)*100.0
 print percCorrect
+
+pickle.dump(knn, open('userData/classifier.p','wb')) 
