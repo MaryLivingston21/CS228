@@ -38,6 +38,7 @@ class RECORDER:
         except:
             "directory exists"
 
+
     def Handle_Frame(self, frame):
         self.i = 0
         hand = frame.hands[0]

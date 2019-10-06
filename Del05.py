@@ -9,6 +9,5 @@ from Recorder import RECORDER
 
 myConstants = CONSTANTS()
 
-
 recorder = RECORDER(Controller(), PYGAME_WINDOW(), int(myConstants.pygameWindowWidth / 2), int(myConstants.pygameWindowDepth / 2), 1000, -1000, 1000, -1000)
 recorder.Run_Forever();
