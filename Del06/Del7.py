@@ -24,10 +24,9 @@ yMin = 1000.0
 yMax = -1000.0
 
 # load in classifier
-clf = pickle.load( open('userData/classifier.p','rb') )
-testData = np.zeros((1,30),dtype='f')
-
-k = 0
+#clf = pickle.load( open('userData/classifier.p','rb') )
+#testData = np.zeros((1,30),dtype='f')
+#k = 0
 
 
 def Scale(n, oMin, oMax, newMin, newMax):
@@ -41,7 +40,7 @@ def Scale(n, oMin, oMax, newMin, newMax):
 
 
 def Handle_Frame(frame):
-	global x, y, xMin, xMax, yMin, yMax, k, testData
+	global x, y, xMin, xMax, yMin, yMax #k, testData
 	hand = frame.hands[0]
 	fingers = hand.fingers
 	k = 0
@@ -49,9 +48,9 @@ def Handle_Frame(frame):
 		Handle_Finger(finger)
 	#print(testData)
 	#testData = CenterData(testData)
-	CenterData()
-	predictedClass = clf.Predict(testData)
-	print(predictedClass)
+	#CenterData()
+	#predictedClass = clf.Predict(testData)
+	#print(predictedClass)
 
 
 def Handle_Finger(finger):
@@ -61,7 +60,7 @@ def Handle_Finger(finger):
 
 
 def Handle_Bone(bone, width):
-	global k, testData
+	#global k, testData
 	base = bone.prev_joint
 	tip = bone.next_joint
 
@@ -70,12 +69,12 @@ def Handle_Bone(bone, width):
 
 	pygameWindow.Draw_Black_Line(xBase, yBase, xTip, yTip, width)
 
-	b = 4 - width
-	if ( (b==0) or (b==3) ):
-		testData[0,k] = tip[0]
-		testData[0,k+1] = tip[1]
-		testData[0,k+2] = tip[2]
-		k = k + 3
+	#b = 4 - width
+	# if ( (b==0) or (b==3) ):
+	# 	testData[0,k] = tip[0]
+	# 	testData[0,k+1] = tip[1]
+	# 	testData[0,k+2] = tip[2]
+	# 	k = k + 3
 
 
 def Handle_Vector_FromLeap(v):
@@ -97,19 +96,19 @@ def Handle_Vector_FromLeap(v):
 
 	return x, y
 
-def CenterData():
-	global testData
-	totalX = testData[0,::3]
-	avgX = totalX.mean()
-	testData[0,::3] = totalX - avgX
-
-	totalY = testData[0,1::3]
-	avgY = totalY.mean()
-	testData[0,1::3] = totalY - avgY
-
-	totalZ = testData[0,2::3]
-	avgZ = totalZ.mean()
-	testData[0,2::3] = totalZ - avgZ
+# def CenterData():
+# 	global testData
+# 	totalX = testData[0,::3]
+# 	avgX = totalX.mean()
+# 	testData[0,::3] = totalX - avgX
+#
+# 	totalY = testData[0,1::3]
+# 	avgY = totalY.mean()
+# 	testData[0,1::3] = totalY - avgY
+#
+# 	totalZ = testData[0,2::3]
+# 	avgZ = totalZ.mean()
+# 	testData[0,2::3] = totalZ - avgZ
 
 
 
