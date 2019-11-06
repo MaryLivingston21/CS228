@@ -256,7 +256,7 @@ def HandleState3():
 
     print("Loop")
     print(loop)
-    if loop < 1:
+    if loop < 3:
         if ranNumber <= 8:
             ranNumber += 1
         else:
