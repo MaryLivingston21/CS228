@@ -39,6 +39,7 @@ yLoc = 0
 numTry = 0 #num tries to match digit
 numCorrect = 0 # num correct matches
 ranNumber = 0
+leastAttemptedNumber = 8
 
 loop = 1 # num times user went through all the digits
 numSec = 10.0 # how long sign should display before hiding
@@ -199,7 +200,6 @@ def HandleState1():
 
 def HandleState2():
     global programState, testData, numCorrect, ranNumber, database, userName, numTry, firstTimeinState2, numSec, isHidden, timer, numTimesBeforeFailure
-
     pygameWindow.numAttempt(database, userName, ranNumber)
     pygameWindow.showNum(ranNumber)
 
@@ -247,7 +247,7 @@ def HandleState2():
     firstTimeinState2 = False
 
 def HandleState3():
-    global programState, numCorrect, ranNumber, loop, numTry, firstTimeinState2, isHidden
+    global programState, numCorrect, ranNumber, loop, numTry, firstTimeinState2, isHidden, leastAttemptedNumber
 
     firstTimeinState2 = True
     isHidden = False
@@ -256,7 +256,7 @@ def HandleState3():
 
     print("Loop")
     print(loop)
-    if loop < 3:
+    if loop < 1:
         if ranNumber <= 8:
             ranNumber += 1
         else:
@@ -264,7 +264,16 @@ def HandleState3():
             loop += 1
     else:
         print("randomNum")
-        ranNumber = random.randrange(10)
+        n = random.randrange(3)
+        if n == 1: # 1/3 of time, display leastAttemptedNumber
+            getLeastAttemptedNumber()
+            print ("NUMBER: ")
+            print(leastAttemptedNumber)
+            ranNumber = leastAttemptedNumber
+        else:
+            ranNumber = random.randrange(10)
+
+        #ranNumber = random.randrange(10)
 
 
     if HandOverDevice() == False:
@@ -273,6 +282,19 @@ def HandleState3():
         programState = 2
     else:
         programState = 1
+
+def getLeastAttemptedNumber():
+    global database, userName, leastAttemptedNumber
+    userRecord = database[userName][1]
+    string = 'digit' + str(leastAttemptedNumber) + 'attempted'
+    valueOfLeastAttemptedNumber = userRecord[string]
+    for digit,value in userRecord.iteritems():
+        #print(digit[5],value)
+        if value < valueOfLeastAttemptedNumber:
+            num = digit[5] #get the digit of that value
+            leastAttemptedNumber = int(num);
+    print leastAttemptedNumber
+
 
 def HandleAttempt():
 	global ranNumber, database, userName
@@ -310,6 +332,8 @@ def getTime():
         numTimesBeforeFailure = 35
         numSec = 0.0
         numTimesBeforeFailure = 30
+
+getLeastAttemptedNumber()
 
 while True:
 	pygameWindow.Prepare()
